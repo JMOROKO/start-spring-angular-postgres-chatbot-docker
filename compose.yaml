@@ -10,5 +10,30 @@ services:
       - chatbot_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - chatbot-net
+  chatbot-back:
+      build: ./backend
+      container_name: chatbot-back
+      environment:
+        - DB_URL=jdbc:postgresql://pgvector:5432/dbCryptoCurrency
+      ports:
+        - '8074:8074'
+      networks:
+        - chatbot-net
+      depends_on:
+        - pgvector #dependance entre service, permet de demander à docker de demarrer le service de la base de données avant de démarrer le backend
+  chatbot-front:
+    build: ./frontend
+    container_name: chatbot-front
+    ports:
+      - '8086:80'
+    networks:
+      - chatbot-net
+    depends_on:
+      - chatbot-back
 volumes:
   chatbot_data:
+networks:
+  chatbot-net:
+    driver: bridge
